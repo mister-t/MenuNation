@@ -30,7 +30,7 @@ define(['jquery'
         if(restaurants) {
           console.log(JSON.stringify(restaurants));
           findSuccess = true;
-          // Backbone.history.navigate('/restaurants', true);
+          Backbone.history.navigate('menus', true);
         } else {
           var strongMsg = self.menuAlert.find('strong');
           if(strongMsg) strongMsg.remove();

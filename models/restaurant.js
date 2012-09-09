@@ -298,7 +298,7 @@ Restaurant.search = function (params, output, callback) {
   var restaurants;
   vclient.search(params, function (response){
     restaurants = response && response.objects ? response.objects : null;
-    console.log(restaurants);
+    // console.log(restaurants);
     callback(null, restaurants);
   });
 };

@@ -1,0 +1,256 @@
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+
+#movies {
+}
+
+#search-icon {
+  position: relative;
+  right: 21px;
+  top: 2px;
+}
+
+.tinj {
+  display: block;
+}
+
+.grid{
+  display: inline-block;
+  border: 4px solid #424547;
+}
+
+.square {
+  display: table-cell;
+  position: relative;
+  height: 40px;
+  width: 40px;
+  background-color:rgba(163,185,235,0.5);
+  border: 1px solid;
+}
+
+.nav-well {
+  padding: 8px 0;
+}
+
+.faq-nav {
+  position: fixed;
+  height: 400px;
+  width: 280px;
+  overflow: auto;
+  
+}
+
+.faq {
+  overflow: auto;
+  height: 600px;
+}
+
+.btn-align {
+  position: relative;
+  bottom: 2px;
+}
+.moviecontainer {
+  display:block;
+  height:400px;
+  overflow:hidden;
+}
+
+.sidecontainer {
+  display:block;
+  height:400px;
+  overflow:hidden;
+}
+
+.dashboard {
+  display: block;
+  position: relative;
+  top: -28px;
+  /*background-color:#DFEBFF;*/
+}
+
+.dashboard-bg {
+  display: block;
+  position: absolute;
+  width: 100%;
+  left: 0px;
+  top: 20px;
+  height: 136px;
+  background-color:rgba(163,185,235,0.5);
+  border-bottom: 1px solid;
+  z-index: -1;
+}
+
+
+.answer {
+  width: 70px;
+}
+
+.info {
+  height:190px;
+  overflow:hidden;
+}
+
+.r {
+/*  min-height: 10em;
+  display: table-cell;
+  vertical-align: bottom;*/
+  height: 60px;
+  width: 342px;
+  overflow:hidden;
+  color:#69BCE3;
+}
+.q {
+  min-height: 10em;
+  display: table-cell;
+  vertical-align: middle;
+  height: 9px;
+  overflow:hidden;
+}
+.answers {
+  display: table-cell;
+  vertical-align: top;
+  overflow:hidden;
+  position:relative;
+  bottom:8px;
+}
+.thanks {
+  vertical-align: middle;
+  display: table-cell;
+  height:300px;
+  overflow:hidden;
+}
+
+.qmodal {
+  width:520px;
+  height:310px;
+  overflow:hidden;
+}
+
+.questionWrapper {
+  background-color: white; 
+  height:220px;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+#questionTicker {  
+  position: relative;
+  top: -10px;
+  left: -10px;
+  height: 248px;
+  width: 320px;
+  overflow: auto;
+  margin-top: 0px;
+}
+
+#questionTicker li {  
+  padding: 5px 5px 0px 5px;
+  background-color: white; 
+/*  border: 1px solid #000000;
+  border-right: none;  
+  border:1px solid black;  */
+  width: 292px;
+  height: 30px;
+}
+
+.btn-answered {
+  position: relative;
+  left: 250px;
+  bottom: 6px;
+  width: 40px;
+}
+
+.progresscontainer {
+  height:22px;
+  overflow:hidden;
+}
+.ratingprogress {
+  position: relative;
+  top: 10px;
+}
+.progress_number {
+  color:black;
+  text-align:justify;
+}
+.ratefooter {
+  height:22px;
+  overflow:hidden;
+}
+.loginbar {
+  vertical-align: bottom;
+  display: table-cell;
+  height:33px;
+  overflow:hidden;
+}
+.navbtn {
+  position: relative;
+  bottom: 4px;
+}
+.search {
+  height: 30px;
+  overflow:hidden;
+}
+.movie-caption {
+  padding-top: 2px; 
+}
+.progress {
+  border-bottom: 1px solid grey;
+  border-right: 1px solid grey;
+}
+
+.rticon {
+  display: inline-block;
+  vertical-align: text-bottom;
+  background: transparent url('http://images.rottentomatoescdn.com/images/redesign/icons-v2.png') no-repeat -312px -160px;
+}
+
+.rticon.tiny.fresh {
+  background-position: -256px -144px;
+  width: 16px;
+  height: 16px;
+}
+
+.movie-config {
+  display:block;
+  position: relative;
+  height: 500px;
+  overflow: auto;
+}
+
+.movie-tab {
+  height: 500px;
+  overflow: auto;
+}
+
+.movie-desc-list {
+  display: none;
+}
+
+.movie-question-tpl {
+  display: none;
+}
+
+.movie-question-table {
+  display: none;
+}
+
+.movie-question-table-form-btns{
+  display: none;
+}
+
+.movie-modal-slide {
+  /* position: relative; */
+}
+
+.movie-modal-slide .inner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
