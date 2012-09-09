@@ -1,7 +1,7 @@
 {
-    "name": "MenuNation"
-  , "version": "0.0.1"
-  , "private": true
+	"name": "MenuNation"
+	, "private": true
+	, "version": "0.0.1"
 	, "engines":
 	{
 		"node": ">=0.8.7",

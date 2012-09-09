@@ -38,7 +38,11 @@ app.configure('production', function(){
 app.get('/', routes.index);
 app.resource('venues', require('./routes/venues'));
 
-
 var port = process.env.PORT || 3000
 app.listen(port);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+
+var Root = require('./models/root');
+Root.initialize(false, {name:true, index:true}, function (err){
+  if (err) throw err;
+});
