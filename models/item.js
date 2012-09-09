@@ -15,7 +15,7 @@ var Cypher = require('./cypher');
 
 // constants:
 var INDEX_NAME = 'items';
-var INDEX_KEYS = ['name','id','rid'];
+var INDEX_KEYS = ['id'];
 
 // private constructor:
 
@@ -40,7 +40,7 @@ Node.proxyProperty(Item, 'date', true);
 
 // converts a Item object to a simple item object
 Item.prototype.convert = function () {
-  return _.pick(this,'name','id','description, price, rid');
+  return _.pick(this,'name','id','description, price, rid, _id');
 };
 
 // indexes the item async
@@ -84,14 +84,14 @@ Item.getIndexed = function (key, value, callback) {
 // return all items with attached tags
 Item.like = function (item, user, output, callback) {
   var query = [
-    'START item=node:items({ITEM}), user=node:users({USER})',
+    'START item=node({ITEM}), user=node:users({USER})',
     'CREATE UNIQUE user-[r:LIKE]->item',
     'SET r.date = COALESCE(r.date?,{DATE})',
-    'RETURN item'
+    'RETURN r'
   ].join('\n');
   
   var params = {
-    ITEM    : 'id:'+item.id
+    ITEM    : Math.floor(item.id/1000)
     , USER  : 'id:'+user.id
     , DATE  : moment().unix()
   };
@@ -101,25 +101,31 @@ Item.like = function (item, user, output, callback) {
     if (err) return callback(err);
     Cypher.results(results, output);
     
-    var items = _.map(results, function (res){
-      var item = new Item(res.item).convert();
-      console.log(item);
-      return item;
-    });
+    // if(results.length){
+    //   console.log(item.name + ' liked by '+user.id);
+    // }
+      
+    callback(null);
+    // }
+    // var items = _.map(results, function (res){
+    //   var item = new Item(res.item).convert();
+    //   console.log(item);
+    //   return item;
+    // });
     
-    callback(null, items);
+    // callback(null, items);
   });
 };
 
 // return all items with attached tags
 Item.find = function (item, output, callback) {
   var query = [
-    'START item=node:items({ITEM})',
+    'START item=node({ITEM})',
     'RETURN item'
   ].join('\n');
   
   var params = {
-    ITEM : 'id:'+item.id
+    ITEM : Math.floor(item.id/1000)
   };
   
   Cypher.query('Item.find',query,params, output);

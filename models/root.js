@@ -137,26 +137,48 @@ Root.initializeClasses = function (initialize, output, callback) {
     console.log('Root.initializeClasses'.magenta);
   }
   // massive async call
-  async.parallel({
-    restaurants : function (callback){
-      Root.initializeRestaurants(output, function (err, results) {
+  async.series({
+    // users : function (callback){
+    //   Root.initializeUsers(output, function (err, results) {
+    //     if (err) return callback(err);
+    //     console.log(results.length+" users added".green);
+    //     callback(err, results);
+    //   });
+    // },
+    // restaurants : function (callback){
+    //   Root.initializeRestaurants(output, function (err, results) {
+    //     if (err) return callback(err);
+    //     console.log((results?results.length:0)+" restaurants added".green);
+    //     callback(err, results);
+    //   });
+    // },
+    test : function (callback){
+      Restaurant.getAll(output, function (err, results){
         if (err) return callback(err);
-        console.log(results.length+" restaurants added".green);
-        callback(err, results);
+        // console.log(results);
+        _.each(results, function (res){
+          Restaurant.likeSome(res, output, function (err, result){
+
+          });
+        });
+        callback(null, results);
       });
     },
-    users : function (callback){
-      Root.initializeUsers(output, function (err, results) {
+    personalized : function (callback){
+      Restaurant.getAll(output, function (err, results){
         if (err) return callback(err);
-        console.log(results.length+" users added".green);
-        callback(err, results);
+        // console.log(results);
+        Restaurant.popular(results[0], true, function (err, result){
+          console.log('popular = '.magenta+JSON.stringify(result));
+          callback(null, results);
+        });
       });
     }
   }, function (err, results) {
     if (err) return callback(err);
 
-    var restaurants = results.restaurants;
-    var users = results.userr;
+    // var restaurants = results.restaurants;
+    // var users = results.user;
     callback(null);
   });
 };
@@ -165,14 +187,25 @@ Root.initializeRestaurants = function (output, callback) {
   if(output){
     console.log('Root.initializeRestaurants'.magenta);
   }
-  // vclient.search()
-  var restaurant;
-  vclient.get_details("b0229cd9cbc5a973e6a9", function (response){
-    restaurant = response && response.objects ? response.objects[0] : null;
-    // console.log(JSON.stringify(restaurant));
-    if (restaurant) {
-      Restaurant.add([restaurant], {name:true, index:true}, callback);
-    }
+  Restaurant.search({cuisine:'thai', locality:'San Francisco'}, true, function (err, results){
+    async.forEachSeries(_.last(results,6), function (res, callback){
+      if(res.has_menu && res.name != "Manora's Thai Cuisine"){
+        var restaurant;
+        vclient.get_details(res.id, function (response){
+          restaurant = response && response.objects ? response.objects[0] : null;
+          // console.log(JSON.stringify(restaurant));
+          if (restaurant) {
+            console.log(restaurant.name.cyan);
+            Restaurant.add([restaurant], {name:true, index:true}, callback);
+          }
+        });
+      } else {
+        callback(null);
+      }
+    }, function (err, results){
+      if(err) return callback(err);
+      callback(null, results);
+    });
   });
 };
 
@@ -187,7 +220,13 @@ Root.initializeUsers = function (output, callback) {
   var user2 = {
     id    : 'tony'
   };
-  User.add([user1, user2], output, callback);
+  var fakes = _.map(_.range(10), function (num){
+    var fake = {
+      id: 'user'+num
+    };
+    return fake;
+  });
+  User.add(fakes.concat([user1, user2]), output, callback);
 };
 
 

@@ -5,11 +5,14 @@ var _s = require('underscore.string');
 var async = require('async');
 var moment = require('moment');
 var colors = require('colors');
+var locu = require('locu');
 
 var neo4j = require('neo4j');
 var db = new neo4j.GraphDatabase(process.env.NEO4J_URL || 'http://localhost:7474');
 
 var Item = require('./item');
+
+var vclient = locu.VenueClient(process.env.LOCU_API_KEY, 'http://api.locu.com');
 
 // model helpers
 var Node = require('./node');
@@ -17,7 +20,7 @@ var Cypher = require('./cypher');
 
 // constants:
 var INDEX_NAME = 'restaurants';
-var INDEX_KEYS = ['name','id'];
+var INDEX_KEYS = ['id'];
 
 // private constructor:
 
@@ -138,17 +141,16 @@ Restaurant.create = function (restaurant, output, callback) {
 
     if(results.length){
       var restaurant = new Restaurant(results[0].restaurant);
-      async.map(results, function (res, callback){
+      restaurant.items = _.map(results, function (res, callback){
         var item = new Item(res.item);
-        item.index(output, item.date == params.DATE, function (err) {
-          callback(item);
-        });
-      }, function (err, items){
-        restaurant.items = items;
+        // item.index(output, item.date == params.DATE, function (err) {
+        // });
+        return item.convert();
+      });
+        // restaurant.items = items;
 
-        restaurant.index(output, restaurant.date == params.DATE, function (err) {
-          callback(err, restaurant.convert());
-        });
+      restaurant.index(true, true, function (err) {
+        callback(err, restaurant.convert());
       });
     } else {
       console.log("no restaurant returned".red);
@@ -160,8 +162,8 @@ Restaurant.create = function (restaurant, output, callback) {
 // return all items for restaurant
 Restaurant.findItems = function (restaurant, output, callback) {
   var query = [
-    'START item=node:items({RESTAURANT})',
-    'MATCH item<-[r?:LIKE]-()',
+    'START restaurant=node:restaurants({RESTAURANT})',
+    'MATCH restaurant<--item<-[r?:LIKE]-()',
     'RETURN item, count(r) as likes'
     // 'ORDER BY likes DESC'
   ].join('\n');
@@ -180,9 +182,42 @@ Restaurant.findItems = function (restaurant, output, callback) {
       var item = new Item(res.item).convert();
       // console.log(item);
       items[item.name] = {
-        id      : item.id
+        id      : item.id        
+        , _id   : item._id
         , likes : res.likes
       };
+    });
+    
+    callback(null, items);
+  });
+};
+
+// return all items for restaurant
+Restaurant.findItemsArray = function (restaurant, output, callback) {
+  var query = [
+    'START restaurant=node:restaurants({RESTAURANT})',
+    'MATCH restaurant<--item',
+    'RETURN item'
+    // 'ORDER BY likes DESC'
+  ].join('\n');
+  
+  var params = {
+    RESTAURANT : 'id:'+restaurant.id
+  };
+  
+  Cypher.query('Restaurant.findItemsArray',query,params,output);
+  db.query(query, params, function (err, results) {
+    if (err) return callback(err);
+    Cypher.results(results, output);
+    
+    var items = _.map(results, function (res){
+      return new Item(res.item).convert();
+      // // console.log(item);
+      // return {
+      //   id      : item.id
+      //   , _id   : item._id
+      //   , likes : res.likes
+      // };
     });
     
     callback(null, items);
@@ -192,10 +227,12 @@ Restaurant.findItems = function (restaurant, output, callback) {
 // personalize by people that like this like that
 Restaurant.personalizeMenu = function (restaurant, user, output, callback) {
   var query = [
-    'START item=node:items({RESTAURANT}), user=node:users({USER})',
-    'MATCH item<-[r?:LIKE]-()-[:LIKE]->item2<-[:LIKE]-user',
-    'RETURN item, count(r) as likes, count(*) as likeness'
-    // 'ORDER BY likes DESC'
+    'START restaurant=node:restaurants({RESTAURANT}), user=node:users({USER})',
+    // 'MATCH restaurant<--item<-[r?:LIKE]-()',
+    // 'WITH restaurant, item, count(*) as likes',
+    'MATCH restaurant<-item-[:KNOWS*1..3]-user',
+    'RETURN item, count(*) as likeness',
+    'ORDER BY likeness DESC'
   ].join('\n');
   
   var params = {
@@ -214,12 +251,103 @@ Restaurant.personalizeMenu = function (restaurant, user, output, callback) {
       // console.log(item);
       items[item.name] = {
         id          : item.id
-        , likes     : res.likes
+        // , likes     : res.likes
         , likeness  : res.likeness
       };
     });
     
     callback(null, items);
+  });
+};
+
+// personalize by people that like this like that
+Restaurant.popular = function (restaurant, output, callback) {
+  var query = [
+    'START restaurant=node:restaurants({RESTAURANT})',
+    'MATCH restaurant<--item<-[r?:LIKE]-()',
+    'RETURN item, count(*) as likes',
+    'ORDER BY likes DESC'
+  ].join('\n');
+  
+  var params = {
+    RESTAURANT  : 'id:'+(restaurant.id || restaurant)
+    // , USER      : 'id:'+(user.id || user)
+  };
+  
+  Cypher.query('Restaurant.popular',query,params,output);
+  db.query(query, params, function (err, results) {
+    if (err) return callback(err);
+    Cypher.results(results, output);
+    
+    var items = {};
+    _.each(results, function (res){
+      var item = new Item(res.item).convert();
+      // console.log(item);
+      items[item.name] = {
+        id          : item.id
+        , likes     : res.likes
+      };
+    });
+    
+    callback(null, items);
+  });
+};
+
+// query locu for the restaurants
+Restaurant.search = function (params, output, callback) {
+  var restaurants;
+  vclient.search(params, function (response){
+    restaurants = response && response.objects ? response.objects : null;
+    console.log(restaurants);
+    callback(null, restaurants);
+  });
+};
+
+// query locu for the restaurants
+Restaurant.likeSome = function (restaurant, output, callback) {
+  Restaurant.findItemsArray(restaurant, output, function (err, items){
+    if(err) return callback(err);
+    console.log('trying to like '+(items ? items.length : 0)+' items for '+restaurant.name.cyan);
+    var likeCount=0;
+    _.each(items, function (item){
+      var rand = (Math.floor(Math.random()*20/(item.likes ? 3 : 1)))+2;
+      var pass = (item.id % rand == 0);
+      // console.log(item.name.cyan + ' like? '+pass);
+      if(pass){
+        // var users = _.
+        var randUser = 'user'+Math.floor(Math.random()*10);
+        likeCount++;
+        // console.log(randUser+' is trying to like '+item.name.cyan);
+        // console.log(item);
+        Item.like(item, {id:randUser}, false, function (err, res){
+          if(err) return callback(err);
+        });
+      }
+    });
+    console.log(likeCount.toString().magenta+' likes added to '+restaurant.name.cyan);
+  });
+};
+
+// return all users
+Restaurant.getAll = function (output, callback) {
+  var query = [
+    'START restaurant=node:restaurants({USER})',
+    'RETURN restaurant',
+    'ORDER BY restaurant.id'
+  ].join('\n');
+  
+  var params = {
+    USER   : 'id:*'
+  };
+  Cypher.query('Restaurant.getAll',query,params,output);
+  db.query(query, params, function (err, results) {
+    if (err) return callback(err);
+    Cypher.results(results, output);
+    
+    var restaurants = _.map(results, function (res) {
+      return new Restaurant(res.restaurant).convert();
+    });
+    callback(null, restaurants);
   });
 };
 
