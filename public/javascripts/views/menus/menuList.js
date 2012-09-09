@@ -47,8 +47,9 @@ define(['jquery'
       this.collection.forEach(function(section) {
          self.$el.append(MenuSectionTpl());
          self.$el.append('<lh><h3>' + section.section_name + '</h3></lh>');
-         for(var j=0; j<section.subsections[0].contents.length; j++) {
-           self.$el.append(tpl({dishName: section.subsections[0].contents[j].name}));
+         var randDishes = _.shuffle(section.subsections[0].contents);
+         for(var j=0; j<randDishes.length; j++) {
+           self.$el.append(tpl({dishName: randDishes[j].name}));
       }
       });
     }

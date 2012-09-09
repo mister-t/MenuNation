@@ -58,7 +58,7 @@ define(['jquery'
         console.log(sections);
         for(var i=0; i<this.NUM_MENU_LISTS; i++) {
         // var menuList = new MenuListView({id: 'tab'+i});
-          tabContent.append(new MenuListView({collection: sections, id: 'tab'+i}).render().el);
+          tabContent.append(new MenuListView({collection: sections, id: 'tab'+i }).render().el);
  
           /*
         if(i == 0) {
