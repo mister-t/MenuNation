@@ -4,10 +4,12 @@ define(['jquery'
     , 'views/includes/navbar'
     , 'views/menus/menus' 
     , 'views/welcome/welcome' 
+    , 'collections/dishes'
     ], function($, _, Backbone
     , Navbar
     , MenusView
-    , WelcomeView) {
+    , WelcomeView
+    , Dishes) {
   var HomeRouter = Backbone.Router.extend({
     routes: {
       '': 'home',
@@ -38,14 +40,27 @@ define(['jquery'
 
     'showMenus': function() {
       if(!this.elms['menusView']) {
-        this.elms['menusView'] = new MenusView().render();
+        this.elms['menusView'] = new MenusView({collection: new Dishes()});
+        var self = this;
+        this.elms['menusView'].collection.fetch({
+          success: function(collection) {
+            // var temp = collection.toJSON();
+            // console.log(temp[0].sections);;
+            // self.elms['menusView'].renderMenuLists(temp[0].sections);
+            self.elms['menusView'].render();
+            if(self.elms['welcomeView']) {
+              self.elms['welcomeView'].dispose();
+            }
+            self.elms['page-content'].html(self.elms['navbar']);
+            self.elms['page-content'].append(self.elms['menusView'].el);
+          },
+          error: function(model, errMsg) {
+            console.log(errMsg);
+          }
+        });
       }
 
-      if(this.elms['welcomeView']) {
-        this.elms['welcomeView'].dispose();
-      }
-      this.elms['page-content'].html(this.elms['navbar']);
-      this.elms['page-content'].append(this.elms['menusView'].el);
+
 
      },
 

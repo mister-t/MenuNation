@@ -25,24 +25,29 @@ define(['jquery'
       _.bindAll(this, 'render', 'renderItems');
       _.templateSettings = { interpolate : /\{\{(.+?)\}\}/g }; //change underscore's interpolate variables to {{var}} from <%var%>
       this.template = _.template(MenuListTpl());
+      // this.bindTo(this.collection, 'reset', this.render);
     },
 
     render: function() {
       $(this.el).html(this.template({title: 'Menu Nation'}));
-      this.renderItems(this.NUM_ITEMS);
+      this.renderItems();
       return this;
     },
 
-    renderItems: function(numItems) {
+    renderItems: function() {
       // var tabPane = this.$el.find('.tab-pane');
       var tpl = _.template(MenuItemTpl());
-      for(var i=0; i<numItems; i++) {
-        this.$el.append(tpl({dishName: this.id + '-dishName' + i}));
+      // console.log(this.models);
+      var self;
+      console.log(this.collection);
+      for(var i=0; i<this.collection.length; i++) {
+        this.$el.append(tpl({dishName: this.collection[i].name}));
       }
+      // this.collection.foreEach(function(item) {
+      //   self.$el.append(tpl({dishName: this.models[i]}));
+      // });
     }
   });
   
   return Menus;
 });
-
-
