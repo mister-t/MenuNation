@@ -4,6 +4,10 @@
  */
 
 var express = require('express')
+  , expressResource = require('express-resource')
+  , util = require('util')
+  , MongoStore = require('connect-mongodb')
+  , mongoose = require('mongoose')
   , routes = require('./routes');
 
 var app = module.exports = express.createServer();
@@ -32,6 +36,8 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
+app.resource('venues', require('./routes/venues'));
+
 
 var port = process.env.PORT || 3000
 app.listen(port);

@@ -32,5 +32,6 @@
     , "colors": ">= 0.6.0-1"  
     , "underscore.string": ">= 2.2.0rc"  
     , "crypto": ">= 0.0.3"
+    , "locu": ">= 0.0.2"
   }
 }
