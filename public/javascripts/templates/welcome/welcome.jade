@@ -1,0 +1,13 @@
+.row
+  .hero-unit
+    h1 {{title}}
+  p
+    #menuAlert.alert.alert-error(style='display:none')
+    form#menuForm(action='#')
+      label(for='name') Name:
+      input#menuName(required, type='text', name='name')
+      p
+      label(for='city') City:
+      input#menuCity(required, type='text', name='city')
+      p
+      button.btn-large.btn-primary(type='submit') Find

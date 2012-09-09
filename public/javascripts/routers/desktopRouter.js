@@ -1,8 +1,11 @@
 define(['jquery',
     'underscore', 
     'backbone', 
+    'views/includes/navbar', 
+    'views/welcome/welcome', 
     ], function($, _, Backbone
-    ) {
+    , Navbar
+    , WelcomeView) {
   var HomeRouter = Backbone.Router.extend({
     routes: {
       '': 'home',
@@ -14,21 +17,20 @@ define(['jquery',
 
       //cached elements
       this.elms = {
+        'page-content': $('#page-content')
       };
-      console.log("Router Initialize function called");
-      Backbone.history.start(true);
+
+      this.elms['page-content'].html(new Navbar().render().el);
+      this.elms['navbar'] = $('#navbar');
+
+      Backbone.history.start();
     },
 
     'home': function() {
-      // console.log("Home function called");
-      // this.elms['page-content'].html(this.welcomeView.render().el);
-      // console.log("Welcome view called");
-
-      //Need to hide the following if user is login
-      // this.elms['page-content'].append(this.guestBtn.render().el);
-      // console.log("Guest Btn called");
-      // this.elms['page-content'].find('#register-tab').append(this.registerTab.render().el);
-      // console.log("RegisterTab called");
+      if(!this.welcomeView) {
+        this.welcomeView = new WelcomeView().render();
+      }
+      this.elms['page-content'].append(this.welcomeView.el);
      },
 
     'defaultAction': function(actions) {
