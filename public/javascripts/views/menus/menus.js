@@ -51,47 +51,45 @@ define(['jquery'
 
     renderMenuLists: function(menuSections) {
       var tabContent = this.$el.find('.tab-content');
-      for(var i=0; i<this.NUM_MENU_LISTS; i++) {
+        var sections = _.filter(menuSections, function(section) {
+          return (section.section_name == 'Starter' || section.section_name == 'Main Courses' || section.section_name == 'Chef Suggestion');
+        });
+
+        console.log(sections);
+        for(var i=0; i<this.NUM_MENU_LISTS; i++) {
         // var menuList = new MenuListView({id: 'tab'+i});
-        
+          tabContent.append(new MenuListView({collection: sections, id: 'tab'+i}).render().el);
+ 
+          /*
         if(i == 0) {
-          this.$el.find('.tab-pane').addClass('active');
-          var starters = _.find(menuSections, function(section) {
+          var dishes = _.find(menuSections, function(section) {
             // console.log(section);
             return section.section_name == 'Starter';
           });
           // console.log(starters);
-          tabContent.append(new MenuListView({collection: starters.subsections[0].contents, id: 'tab'+i}).render().el);
+          tabContent.append(new MenuListView({collection: dishes.subsections[0].contents, id: 'tab'+i, listTitle: dishes.section_name }).render().el);
         }
 
         if(i == 1) {
-          var mainCourses = _.find(menuSections, function(section) {
+          var dishes = _.find(menuSections, function(section) {
             // console.log(section);
             return section.section_name == 'Main Courses';
           });
           // console.log(starters);
-          tabContent.append(new MenuListView({collection: mainCourses.subsections[0].contents, id: 'tab'+i}).render().el);
+          tabContent.append(new MenuListView({collection: dishes.subsections[0].contents, id: 'tab'+i, listTitle: dishes.section_name }).render().el);
         }
 
         if(i == 2) {
-          var chefSuggestion = _.find(menuSections, function(section) {
+          var dishes = _.find(menuSections, function(section) {
             // console.log(section);
             return section.section_name == 'Chef Suggestion';
           });
           // console.log(starters);
-          tabContent.append(new MenuListView({collection: chefSuggestion.subsections[0].contents, id: 'tab'+i}).render().el);
-        }
-
-
-        /*
-        if(i == 1) {
-          tabContent.append(menuList.render().el);
-        }
-
-        if(i == 2) {
-          tabContent.append(menuList.render().el);
+          tabContent.append(new MenuListView({collection: dishes.subsections[0].contents, id: 'tab'+i, listTitle: dishes.section_name }).render().el);
         }
         */
+
+          this.$el.find('#tab0').addClass('active'); //made the first tab active
       }
     }
   });
