@@ -1,6 +1,7 @@
-!!!
-html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body!= body
+!!! 5
+html(lang="en")
+  include header
+  .container.offset2.span12#page-content
+    body!= body
+  include footer
+  include /includes/scripts
